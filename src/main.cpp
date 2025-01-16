@@ -1,4 +1,5 @@
 #include <config.h>
+#include <iomanip>
 
 int renderWidth;
 int renderHeight;
@@ -19,19 +20,24 @@ void renderInit(int width, int height){
 }
 void renderFrags(){
   float currentG = 0;
+  float prog = 0.0f;
+  //Render
   for(int i = 1; i < renderWidth*renderHeight; i ++){
     frags[i].r = frags[i-1].r + 1.0f/renderWidth;
     frags[i].g = currentG;
     if(i%renderWidth == 0){
+      prog += renderWidth;
+      std::cout << "Rendering: " << std::round((prog/(renderWidth*renderHeight))*100) << "%\n";
       if(i+1 <renderWidth*renderHeight) {
         i++;
       }
-      std::cout << "new row!\n";
       currentG += 1.0f/renderHeight;
     }
   }
+  std::cout << "Rendering Complete!\n";
 }
 void renderToPPM(const std::string& filename){
+    std::cout << "\nExporting file as render.ppm...";
     std::ofstream file(filename);
     if(!file.is_open()){
         std::cerr << "Unable to open file";
@@ -48,6 +54,8 @@ void renderToPPM(const std::string& filename){
         file << red << " " << green << " " << blue << std::endl;
     }
     file.close();
+
+    std::cout << "\nImage Exported!\n\n";
 }
 
 int main() {

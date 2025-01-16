@@ -67,7 +67,7 @@ build CMakeFiles/AHRay.dir/src/main.cpp.obj: CXX_COMPILER__AHRay_unscanned_Debug
 build AHRay.exe: CXX_EXECUTABLE_LINKER__AHRay_Debug CMakeFiles/AHRay.dir/src/main.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  LINK_PATH = -LC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include/scene.h
+  LINK_PATH = -LC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include/fragment.h
   OBJECT_DIR = CMakeFiles\AHRay.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
