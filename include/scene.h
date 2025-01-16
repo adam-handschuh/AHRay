@@ -29,4 +29,10 @@ struct Fragment{
         this->b = b;
     }
 };
+
+struct Camera{
+public:
+  Vector3 position, lookAt;
+};
+
 #endif//AHRAY_SCENE_H
