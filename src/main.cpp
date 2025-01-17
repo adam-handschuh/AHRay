@@ -1,8 +1,6 @@
 #include <config.h>
-#include <iomanip>
 
-int renderWidth;
-int renderHeight;
+float renderWidth, renderHeight;
 
 Fragment* frags;
 
@@ -11,30 +9,32 @@ void renderInit(int width, int height){
     renderWidth = width;
     renderHeight = height;
 
-    //Create an array of fragments based on resolution
-    frags = new Fragment[renderWidth*renderHeight];
+    Viewport viewport(renderWidth, renderHeight);
+    Camera camera(&viewport);
+    camera.initialise(Vector3(0,0,0), Vector3(0,0,100), Vector3(0,1,0));
 
-    for(int i = 0; i < renderWidth*renderHeight; i++){
-        frags[i].setFinalColour(0.0f,0.0f,0.0f);
-    }
+    //Create an array of fragments based on resolution
+
 }
-void renderFrags(){
-  float currentG = 0;
-  float prog = 0.0f;
-  //Render
+void renderBackground(){
+  std::cout << "Step 1. Rendering Background" << std::endl;
+  float currentB = 0.0f;
   for(int i = 1; i < renderWidth*renderHeight; i ++){
-    frags[i].r = frags[i-1].r + 1.0f/renderWidth;
-    frags[i].g = currentG;
+    frags[i].b = 1.0f;
+    frags[i].r = currentB;
+    frags[i].g = currentB;
     if(i%renderWidth == 0){
-      prog += renderWidth;
-      std::cout << "Rendering: " << std::round((prog/(renderWidth*renderHeight))*100) << "%\n";
       if(i+1 <renderWidth*renderHeight) {
         i++;
       }
-      currentG += 1.0f/renderHeight;
+      currentB += 1.0f/renderHeight;
     }
   }
-  std::cout << "Rendering Complete!\n";
+}
+void renderFrags(){
+  renderBackground();
+  std::cout << "Step 2. Rendering Sphere" << std::endl;
+  //Render
 }
 void renderToPPM(const std::string& filename){
     std::cout << "\nExporting file as render.ppm...";
@@ -59,8 +59,9 @@ void renderToPPM(const std::string& filename){
 }
 
 int main() {
-    renderInit(800, 600);
+    renderInit(500, 500);
     renderFrags();
     renderToPPM("render.ppm");
+
     return 0;
 }

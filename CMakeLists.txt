@@ -9,7 +9,8 @@ add_executable(AHRay
         include/vector3.h
         src/config.h
         include/ray.h
-        include/camera.h)
+        include/camera.h
+        include/viewport.h)
 
 target_include_directories(AHRay
         PRIVATE include

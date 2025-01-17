@@ -1,6 +1,10 @@
 #ifndef AHRAY_FRAGMENT_H
 #define AHRAY_FRAGMENT_H
+#include <viewport.h>
+#include <vector3.h>
+
 struct Fragment{
+public:
     float r,g,b;
 
     void setFinalColour(float r, float g, float b){

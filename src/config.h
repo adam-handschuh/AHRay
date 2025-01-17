@@ -1,6 +1,8 @@
 //Custom headers
 #include <fragment.h>
 #include <vector3.h>
+#include <ray.h>
+#include <camera.h>
 
 //Built-in libraries
 #include <algorithm>

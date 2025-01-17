@@ -1,4 +1,4 @@
 # ninja log v6
 30	7578	7586385233218072	CMakeFiles/AHRay.dir/main.cpp.obj	cf8b1a495824a0f3
-782	885	7587337894615643	AHRay.exe	979855af5e0cae4c
-7	781	7587337886870702	CMakeFiles/AHRay.dir/src/main.cpp.obj	87be69ac2ff95f25
+923	1893	7587395660646507	AHRay.exe	979855af5e0cae4c
+10	923	7587395651511347	CMakeFiles/AHRay.dir/src/main.cpp.obj	87be69ac2ff95f25

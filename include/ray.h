@@ -7,9 +7,16 @@ private:
   Vector3 origin, direction;
 public:
   //Constructor which must initialise origin point and direction vector
-  Ray(Vector3 origin, Vector3 direction){
-      this->origin = origin;
-      this->direction = direction;
+  Ray(Vector3 origin){
+      this->origin = this->origin;
+  }
+
+  void setDirection(Vector3 pixelCenter){
+    direction = pixelCenter - origin;
+  }
+
+  void getColour(){
+
   }
 
   //Represents function P(t) which gives the point at t time of the ray-cast
