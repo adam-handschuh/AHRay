@@ -21,7 +21,7 @@ public:
   }
 
   // Vector Utility Functions
-  float length(){
+  float length() const{
     return std::sqrt(x*x + y*y + z*z);
   }
 
@@ -59,6 +59,10 @@ public:
     return Vector3(this->y * v.z - this->z * v.y,
                    this->z * v.x - this->x * v.z,
                    this->x * v.y - this->y * v.x);
+  }
+
+  static inline Vector3 unitVec(const Vector3& v){
+    return v/v.length();
   }
 };
 #endif

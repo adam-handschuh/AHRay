@@ -2,6 +2,7 @@
 #define AHRAY_VIEWPORT_H
 
 #include <vector3.h>
+#include <fragment.h>
 
 class Viewport{
 public:
@@ -9,7 +10,6 @@ public:
   float imageWidth, imageHeight;
   Vector3 u,v;
   Vector3 pixelDeltaU, pixelDeltaV;
-
 
   Viewport(float imageWidth, float imageHeight){
     this->imageWidth = imageWidth;
