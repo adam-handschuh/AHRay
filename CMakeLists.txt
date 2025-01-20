@@ -10,7 +10,9 @@ add_executable(AHRay
         src/config.h
         include/ray.h
         include/camera.h
-        include/viewport.h)
+        include/viewport.h
+        include/scene.h
+        include/sphere.h)
 
 target_include_directories(AHRay
         PRIVATE include

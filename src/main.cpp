@@ -15,9 +15,17 @@ void renderScene(int width, int height){
     Camera camera(viewport);
     camera.initialise(Vector3(0,0,0), Vector3(0,0,100), Vector3(0,1,0));
 
+    //Set up scene
+    Scene scene;
+    //spheres
+    scene.addToScene("sphere", Vector3(0,0,-1), 0.5f);
+    scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f);
+
+
+
     std::cout << "Rendering" << std::endl;
     //Render to an array of fragments based on resolution
-    camera.render(frags);
+    camera.render(frags, scene);
 }
 void saveAsPPM(const std::string& filename){
     std::cout << "\nExporting file as render.ppm...";

@@ -4,6 +4,8 @@
 #include <ray.h>
 #include <camera.h>
 #include <viewport.h>
+#include <scene.h>
+#include <sphere.h>
 
 //Built-in libraries
 #include <algorithm>

@@ -5,6 +5,7 @@
 #include <fragment.h>
 #include <viewport.h>
 #include <vector>
+#include <scene.h>
 
 class Camera{
 public:
@@ -27,7 +28,7 @@ public:
     this->up = up;
   }
 
-  void render(std::vector<Fragment> &frags){
+  void render(std::vector<Fragment> &frags, Scene &scene){
     Ray ray(eye);
     //Location of the first pixel (top-left corner)
     Vector3 startPixel = (eye - Vector3(0,0,focalLength) - (viewport->u/2) - (viewport->v/2))
@@ -39,7 +40,8 @@ public:
         ray.setDirection(pixelCenter);
         Fragment frag;
 
-        frag.setFinalColour(ray.getColour().x,ray.getColour().y,ray.getColour().z);
+        Vector3 colour = ray.getColour(&scene);
+        frag.setFinalColour(colour.x,colour.y,colour.z);
 
         frags.push_back(frag);
       }

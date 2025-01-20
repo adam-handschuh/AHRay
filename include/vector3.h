@@ -24,6 +24,9 @@ public:
   float length() const{
     return std::sqrt(x*x + y*y + z*z);
   }
+  float lengthSqrd() const{
+    return length() * length();
+  }
 
   inline std::ostream& operator<<(std::ostream& out) const{
     return out << this->x << ' ' << this->y << ' ' << this->z;
