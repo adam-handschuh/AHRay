@@ -12,7 +12,9 @@ add_executable(AHRay
         include/camera.h
         include/viewport.h
         include/scene.h
-        include/sphere.h)
+        include/sphere.h
+        include/hitrecord.h
+)
 
 target_include_directories(AHRay
         PRIVATE include

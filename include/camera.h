@@ -12,8 +12,10 @@ public:
   Vector3 eye, lookAt, up;
   float aspectRatio;
   float fov = 50.0f;
-  float depth = 50.0f;
+  int depth = 20;
   float focalLength = 1.0f;
+
+  const int numberOfSamples = 200;
   Viewport* viewport;
 
 
@@ -28,8 +30,32 @@ public:
     this->up = up;
   }
 
-  void render(std::vector<Fragment> &frags, Scene &scene){
-    Ray ray(eye);
+  Vector3 getColour(Ray& ray, Scene& scene, int currentDepth){
+    if(currentDepth <= 0){
+      return Vector3(0.0f,0.0f,0.0f);
+    }
+
+    //Create a record to track recursive hits
+    HitRecord hitRec;
+    if (scene.hitSphere(ray, hitRec)) {
+        // 1. Calculate a new direction after hit
+        Vector3 dir = Vector3::newDirectionOnHemisphere(hitRec.normal);
+        // 2. Create a new ray starting at the most recent hitpoint with new dir
+        Ray newRay(hitRec.position, dir);
+        // 3. Calculate attenuation value to diminish intensity after each hit
+        float attenuation = 0.8;
+        // 4. Recursively trace the rays
+        return getColour(newRay, scene, currentDepth - 1) * attenuation;
+    }
+
+    // If the sphere is not hit (background)
+    Vector3 unitDir = Vector3::unitVec(ray.direction);
+    auto a = 0.5*(unitDir.y + 1.0);
+    auto b = Vector3(1.0, 1.0, 1.0)*(1.0-a) + Vector3(0.5, 0.7, 1.0)*a;
+    return b; // Returns a gradient of blue based on the y direction of the ray
+  }
+
+  void render(std::vector<Fragment> &frags, Scene scene){
     //Location of the first pixel (top-left corner)
     Vector3 startPixel = (eye - Vector3(0,0,focalLength) - (viewport->u/2) - (viewport->v/2))
                          + ((viewport->pixelDeltaU + viewport->pixelDeltaV)/2);
@@ -37,12 +63,18 @@ public:
     for(int h = 0; h < viewport->imageHeight; h ++){
       for(int w = 0; w < viewport->imageWidth; w ++){
         Vector3 pixelCenter = startPixel + (viewport->pixelDeltaU * w) + (viewport->pixelDeltaV*h);
-        ray.setDirection(pixelCenter);
         Fragment frag;
+        Vector3 colour(0.0f,0.0f,0.0f);
 
-        Vector3 colour = ray.getColour(&scene);
-        frag.setFinalColour(colour.x,colour.y,colour.z);
+        //Obtain multiple samples (antialiasing)
+        for(int s = 0; s < numberOfSamples; s ++) {
+          Vector3 tempOffset = (viewport->pixelDeltaU + viewport->pixelDeltaV) * (float(rand()%100)/100.0f);
+          tempOffset = tempOffset - tempOffset/2;
+          Ray ray(eye, Vector3::unitVec(pixelCenter-eye + tempOffset));
+          colour = colour + getColour(ray, scene, depth)/float(numberOfSamples);
+        }
 
+        frag.setFinalColour(colour.x, colour.y, colour.z);
         frags.push_back(frag);
       }
     }

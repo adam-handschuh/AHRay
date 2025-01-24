@@ -2,30 +2,28 @@
 #include <vector>
 
 int renderWidth, renderHeight;
-
 std::vector<Fragment> frags;
+Scene scene;
+
+void createScene(){
+  scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f);
+  scene.addToScene("sphere", Vector3(0,0,-1), 0.5f);
+}
 
 void renderScene(int width, int height){
     //Set the resolution
     renderWidth = width;
     renderHeight = height;
 
+    //Initialise the viewport and camera
     std::cout << "Initialisation" << std::endl;
     Viewport* viewport = new Viewport(float(renderWidth), float(renderHeight));
     Camera camera(viewport);
     camera.initialise(Vector3(0,0,0), Vector3(0,0,100), Vector3(0,1,0));
 
-    //Set up scene
-    Scene scene;
-    //spheres
-    scene.addToScene("sphere", Vector3(0,0,-1), 0.5f);
-    scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f);
-
-
-
+    //Render the scene using the camera
     std::cout << "Rendering" << std::endl;
-    //Render to an array of fragments based on resolution
-    camera.render(frags, scene);
+    camera.render(frags, scene);     //Render to an array of fragments based on resolution
 }
 void saveAsPPM(const std::string& filename){
     std::cout << "\nExporting file as render.ppm...";
@@ -50,7 +48,8 @@ void saveAsPPM(const std::string& filename){
 }
 
 int main() {
-    renderScene(400, 400);
+    createScene();
+    renderScene(300, 300);
     saveAsPPM("render.ppm");
     return 0;
 }
