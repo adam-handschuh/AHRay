@@ -8,6 +8,11 @@ public:
   Vector3 origin, direction;
 
   //Constructor which must initialise origin point and direction vector
+  Ray(){
+      this->origin = Vector3(0.0f,0.0f,0.0f);
+      this->direction = Vector3(0.0f,0.0f,0.0f);
+  }
+
   Ray(Vector3 origin, Vector3 direction){
       this->origin = origin;
       this->direction = direction;

@@ -8,20 +8,15 @@
 #include <scene.h>
 
 class Camera{
-public:
+private:
   Vector3 eye, lookAt, up;
-  float aspectRatio;
-  float fov = 50.0f;
-  int depth = 20;
-  float focalLength = 1.0f;
-
-  const int numberOfSamples = 200;
-  Viewport* viewport;
-
-
-  explicit Camera(Viewport* viewport){
-    this->viewport = viewport;
-    this->aspectRatio = viewport->width/viewport->height;
+  const int depth = 10;
+  const float focalLength = 1.0f;
+  const int numberOfSamples = 100;
+  Viewport *viewport;
+public:
+  explicit Camera(Viewport &viewport){
+    this->viewport = &viewport;
   }
 
   void initialise(Vector3 eye, Vector3 lookAt, Vector3 up){
@@ -40,12 +35,12 @@ public:
     if (scene.hitSphere(ray, hitRec)) {
         // 1. Calculate a new direction after hit
         Vector3 dir = Vector3::newDirectionOnHemisphere(hitRec.normal);
-        // 2. Create a new ray starting at the most recent hitpoint with new dir
-        Ray newRay(hitRec.position, dir);
+        // 2. Create a new ray starting at the most recent hit point with new dir
+        Ray newRay(hitRec.position, hitRec.currentMat->getRoughness() >= 0.0f ? Vector3::unitVec(Vector3::reflect(hitRec.position, hitRec.normal)) + (Vector3::unitVecRand() * hitRec.currentMat->getRoughness()) : dir);
         // 3. Calculate attenuation value to diminish intensity after each hit
         float attenuation = 0.8;
         // 4. Recursively trace the rays
-        return getColour(newRay, scene, currentDepth - 1) * attenuation;
+        return getColour(newRay, scene, currentDepth - 1) * hitRec.currentMat->getColour() * attenuation;
     }
 
     // If the sphere is not hit (background)

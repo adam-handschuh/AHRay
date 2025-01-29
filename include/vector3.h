@@ -85,13 +85,17 @@ public:
     }
   }
 
-  static inline Vector3 newDirectionOnHemisphere(Vector3 normal) {
+  static inline Vector3 newDirectionOnHemisphere(const Vector3 normal) {
     Vector3 on_unit_sphere = unitVecRand();
     if (on_unit_sphere.dot(normal) > 0.0) { // In the same hemisphere as the normal
       return on_unit_sphere;
     }else {
       return on_unit_sphere * -1.0f;
     }
+  }
+
+  static inline Vector3 reflect(const Vector3 &vec, const Vector3 &norm){
+    return vec - norm*vec.dot(norm)*2.0f;
   }
 };
 #endif

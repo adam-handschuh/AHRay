@@ -5,25 +5,21 @@
 #include <vector3.h>
 #include <ray.h>
 #include <hitrecord.h>
+#include <material.h>
 
 class Sphere{
 private:
-  struct Material{
-  public:
-    Vector3 diffuseColour;
-    float reflectivity = 0;
-  };
 
 public:
   Vector3 pos;
   float radius;
-  Material material;
+  Material* material;
 
 
-  Sphere(Vector3 pos, float radius){
+  Sphere(Vector3 pos, float radius, Material &material){
     this->pos = pos;
     this->radius = radius;
-    material.diffuseColour = Vector3(1.0f,1.0f,1.0f);
+    this->material = &material;
   }
 
   bool hit(Ray &ray, double min, double max, HitRecord &hitRec) {
@@ -54,7 +50,8 @@ public:
     hitRec.t = root;
     hitRec.position = ray.at(hitRec.t);
     Vector3 outward_normal = (hitRec.position - this->pos) / this->radius;
-    hitRec.set_face_normal(ray, outward_normal);
+    hitRec.setFaceNormal(ray, outward_normal);
+    hitRec.setMaterial(*material);
     return true;
 
   }

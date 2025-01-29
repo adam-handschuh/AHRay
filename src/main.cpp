@@ -1,32 +1,51 @@
 #include <config.h>
-#include <vector>
 
 int renderWidth, renderHeight;
 std::vector<Fragment> frags;
 Scene scene;
 
-void createScene(){
-  scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f);
-  scene.addToScene("sphere", Vector3(0,0,-1), 0.5f);
-}
+//Materials
+Material base(Vector3(1,1,1), -1);
+Material metal(Vector3(0,0.4,0.9), 0.25);
+Material diffuse(Vector3(0,0.9,0), -1);
+Material mirror(Vector3(0.9,0.9,0.9), 0.0);
+Material light(Vector3(10.0,10.0f,10.0f),0);
 
+
+void createScene(){
+  //Big Sphere (Base)
+  scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f, base);
+  //Medium Sphere (Mirror)
+  scene.addToScene("sphere", Vector3(-0.2,0.2,-2.0), 0.7f, mirror);
+  //Small Sphere (Metal)
+  scene.addToScene("sphere", Vector3(0.5f,-0.25,-1.25f), 0.25f, metal);
+  //Smaller Sphere (Diffuse)
+  scene.addToScene("sphere", Vector3(-0.4f,-0.35,-1.0f), 0.15f, diffuse);
+  //Flying Sphere (Light (TESTING))
+  //scene.addToScene("sphere", Vector3(0.6,2.0,-3.0), 0.5, light);
+}
 void renderScene(int width, int height){
-    //Set the resolution
+    //Store resolution
     renderWidth = width;
     renderHeight = height;
 
     //Initialise the viewport and camera
-    std::cout << "Initialisation" << std::endl;
-    Viewport* viewport = new Viewport(float(renderWidth), float(renderHeight));
+    std::cout << "1. Initialising...";
+    Viewport viewport(width,
+                      height,
+                      65.0f);
+
     Camera camera(viewport);
-    camera.initialise(Vector3(0,0,0), Vector3(0,0,100), Vector3(0,1,0));
+    camera.initialise(Vector3(0,0,0),
+                      Vector3(0,0,100),
+                      Vector3(0,1,0));
 
     //Render the scene using the camera
-    std::cout << "Rendering" << std::endl;
+    std::cout << "Complete\n2. Rendering...";
     camera.render(frags, scene);     //Render to an array of fragments based on resolution
 }
 void saveAsPPM(const std::string& filename){
-    std::cout << "\nExporting file as render.ppm...";
+    std::cout << "Complete\n3. Exporting file as render.ppm...";
     std::ofstream file(filename);
     if(!file.is_open()){
         std::cerr << "Unable to open file";
@@ -44,12 +63,12 @@ void saveAsPPM(const std::string& filename){
     }
     file.close();
 
-    std::cout << "\nImage Exported!\n\n";
+    std::cout << "Complete\n\nImage Exported!\n\n";
 }
 
 int main() {
-    createScene();
-    renderScene(300, 300);
-    saveAsPPM("render.ppm");
-    return 0;
+  createScene();
+  renderScene(400, 400);
+  saveAsPPM("render.ppm");
+  return 0;
 }

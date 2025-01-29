@@ -9,9 +9,9 @@ class Scene {
 public:
   std::vector<Sphere> spheres;
 
-  void addToScene(std::string objectName, Vector3 position, float scale) {
+  void addToScene(std::string objectName, Vector3 position, float scale, Material &material) {
     if (objectName == "sphere") {
-      Sphere newSphere(position, scale);
+      Sphere newSphere(position, scale, material);
       spheres.push_back(newSphere);
     }
   }
