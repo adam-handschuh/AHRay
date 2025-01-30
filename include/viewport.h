@@ -2,7 +2,6 @@
 #define AHRAY_VIEWPORT_H
 
 #include <vector3.h>
-#include <fragment.h>
 
 class Viewport{
 public:

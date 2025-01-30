@@ -1,6 +1,5 @@
 #ifndef AHRAY_FRAGMENT_H
 #define AHRAY_FRAGMENT_H
-#include <vector3.h>
 
 struct Fragment{
 public:

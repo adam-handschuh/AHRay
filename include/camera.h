@@ -10,9 +10,9 @@
 class Camera{
 private:
   Vector3 eye, lookAt, up;
-  const int depth = 10;
+  const int depth = 20;
   const float focalLength = 1.0f;
-  const int numberOfSamples = 100;
+  const int numberOfSamples = 200;
   Viewport *viewport;
 public:
   explicit Camera(Viewport &viewport){
@@ -34,12 +34,25 @@ public:
     HitRecord hitRec;
     if (scene.hitSphere(ray, hitRec)) {
         // 1. Calculate a new direction after hit
-        Vector3 dir = Vector3::newDirectionOnHemisphere(hitRec.normal);
-        // 2. Create a new ray starting at the most recent hit point with new dir
-        Ray newRay(hitRec.position, hitRec.currentMat->getRoughness() >= 0.0f ? Vector3::unitVec(Vector3::reflect(hitRec.position, hitRec.normal)) + (Vector3::unitVecRand() * hitRec.currentMat->getRoughness()) : dir);
-        // 3. Calculate attenuation value to diminish intensity after each hit
+        Vector3 dir;
+        // 2. Define refractive index
+        double refIndex = hitRec.front_face ? (1.0/1.5) : 1.5;
+        // 3. Calculate new direction for ray
+        if(hitRec.currentMat->getRoughness() >= 0.0f){
+          // 3.1  Reflective
+          dir = Vector3::unitVec(Vector3::reflect(ray.direction, hitRec.normal)) + (Vector3::unitVecRand() * hitRec.currentMat->getRoughness());
+        }else if(hitRec.currentMat->getRoughness() >= -1.0f){
+          // 3.2  Diffuse
+          dir = Vector3::newDirectionOnHemisphere(hitRec.normal);
+        }else{
+          // 3.3  Refractive
+          dir = Vector3::refract(ray.direction,hitRec.normal,refIndex);
+        }
+        // 4. Create new ray with newly calculated direction
+        Ray newRay(hitRec.position, dir);
+        // 5. Calculate attenuation value to diminish intensity after each hit
         float attenuation = 0.8;
-        // 4. Recursively trace the rays
+        // 6. Recursively trace the rays
         return getColour(newRay, scene, currentDepth - 1) * hitRec.currentMat->getColour() * attenuation;
     }
 

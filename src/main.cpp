@@ -5,24 +5,24 @@ std::vector<Fragment> frags;
 Scene scene;
 
 //Materials
-Material base(Vector3(1,1,1), -1);
-Material metal(Vector3(0,0.4,0.9), 0.25);
-Material diffuse(Vector3(0,0.9,0), -1);
+Material base(Vector3(1,1,1), -1.0);
+Material metal(Vector3(0.9,0.6,0.9), 0.25);
+Material diffuse(Vector3(0,0.9,0), 0.0);
 Material mirror(Vector3(0.9,0.9,0.9), 0.0);
-Material light(Vector3(10.0,10.0f,10.0f),0);
+Material glass(Vector3(0.7,0.7,0.9), -1.2);
 
 
 void createScene(){
   //Big Sphere (Base)
   scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f, base);
-  //Medium Sphere (Mirror)
+  //Medium Sphere (Mirror [Reflection])
   scene.addToScene("sphere", Vector3(-0.2,0.2,-2.0), 0.7f, mirror);
+  //Small Sphere (Glass [Refraction])
+  scene.addToScene("sphere", Vector3(0.1f,-0.30,-1.0f), 0.2f, glass);
   //Small Sphere (Metal)
-  scene.addToScene("sphere", Vector3(0.5f,-0.25,-1.25f), 0.25f, metal);
+  scene.addToScene("sphere", Vector3(0.65f,-0.25,-1.55f), 0.25f, metal);
   //Smaller Sphere (Diffuse)
   scene.addToScene("sphere", Vector3(-0.4f,-0.35,-1.0f), 0.15f, diffuse);
-  //Flying Sphere (Light (TESTING))
-  //scene.addToScene("sphere", Vector3(0.6,2.0,-3.0), 0.5, light);
 }
 void renderScene(int width, int height){
     //Store resolution
@@ -37,7 +37,7 @@ void renderScene(int width, int height){
 
     Camera camera(viewport);
     camera.initialise(Vector3(0,0,0),
-                      Vector3(0,0,100),
+                      Vector3(0,0,0),
                       Vector3(0,1,0));
 
     //Render the scene using the camera
@@ -68,7 +68,7 @@ void saveAsPPM(const std::string& filename){
 
 int main() {
   createScene();
-  renderScene(400, 400);
+  renderScene(400, 300);
   saveAsPPM("render.ppm");
   return 0;
 }

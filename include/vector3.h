@@ -97,5 +97,26 @@ public:
   static inline Vector3 reflect(const Vector3 &vec, const Vector3 &norm){
     return vec - norm*vec.dot(norm)*2.0f;
   }
+
+  static inline Vector3 refract(const Vector3& uv, const Vector3& n, double refractiveIndex) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(0, 1);
+
+    auto cos_theta = std::fmin(-uv.dot(n), 1.0);
+    if (reflectance(cos_theta, refractiveIndex) <= dis(gen)) {
+      Vector3 r_out_perp = (uv + n * cos_theta) * refractiveIndex;
+      Vector3 r_out_parallel =
+          n * -std::sqrt(std::fabs(1.0 - r_out_perp.lengthSqrd()));
+      return r_out_perp + r_out_parallel;
+    }
+    return reflect(uv,n);
+  }
+
+  static double reflectance(double cosine, double refractiveIndex) {
+    auto r0 = (1 - refractiveIndex) / (1 + refractiveIndex);
+    r0 = r0*r0;
+    return r0 + (1-r0)*std::pow((1 - cosine),5);
+  }
 };
 #endif
