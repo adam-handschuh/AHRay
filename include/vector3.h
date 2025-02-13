@@ -108,6 +108,7 @@ public:
       Vector3 r_out_perp = (uv + n * cos_theta) * refractiveIndex;
       Vector3 r_out_parallel =
           n * -std::sqrt(std::fabs(1.0 - r_out_perp.lengthSqrd()));
+
       return r_out_perp + r_out_parallel;
     }
     return reflect(uv,n);

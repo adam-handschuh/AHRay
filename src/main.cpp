@@ -4,6 +4,8 @@ int renderWidth, renderHeight;
 std::vector<Fragment> frags;
 Scene scene;
 
+const int frames = 0;
+
 //Materials
 Material base(Vector3(1,1,1), -1.0);
 Material metal(Vector3(0.9,0.6,0.9), 0.25);
@@ -18,7 +20,7 @@ void createScene(){
   //Medium Sphere (Mirror [Reflection])
   scene.addToScene("sphere", Vector3(-0.2,0.2,-2.0), 0.7f, mirror);
   //Small Sphere (Glass [Refraction])
-  scene.addToScene("sphere", Vector3(0.1f,-0.30,-1.0f), 0.2f, glass);
+  scene.addToScene("sphere", Vector3(0.1f,-0.29,-1.0f), 0.2f, glass);
   //Small Sphere (Metal)
   scene.addToScene("sphere", Vector3(0.65f,-0.25,-1.55f), 0.25f, metal);
   //Smaller Sphere (Diffuse)
@@ -33,11 +35,11 @@ void renderScene(int width, int height){
     std::cout << "1. Initialising...";
     Viewport viewport(width,
                       height,
-                      65.0f);
+                      80.0f);
 
     Camera camera(viewport);
-    camera.initialise(Vector3(0,0,0),
-                      Vector3(0,0,0),
+    camera.initialise(Vector3(-1,2,0),
+                      Vector3(0,0,-1),
                       Vector3(0,1,0));
 
     //Render the scene using the camera
@@ -68,7 +70,7 @@ void saveAsPPM(const std::string& filename){
 
 int main() {
   createScene();
-  renderScene(400, 300);
+  renderScene(200, 200);
   saveAsPPM("render.ppm");
   return 0;
 }

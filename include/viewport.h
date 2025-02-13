@@ -7,7 +7,7 @@ class Viewport{
 public:
   float width, height;
   int imageWidth, imageHeight;
-  Vector3 u,v;
+  Vector3 u,v,w;
   Vector3 pixelDeltaU, pixelDeltaV;
 
   Viewport(int imageWidth, int imageHeight, float fov){
@@ -16,12 +16,19 @@ public:
 
     height = 2.0f * tan((fov * 0.5f) * (M_PI / 180.0f));
     width = height * (float(imageWidth)/float(imageHeight));
+  }
 
-    this->u = Vector3(width,0,0);
-    this->v = Vector3(0, -height, 0);
+  void calculate(Vector3 eye, Vector3 lookAt, Vector3 up){
+    // Calculate orthonormal basis
+    this->w = Vector3::unitVec(eye - lookAt);    // Forward (negative z-axis)
+    Vector3 u = Vector3::unitVec(up.cross(this->w)); // Right (x-axis)
+    Vector3 v = this->w.cross(u); // True Up (y-axis)
 
-    this->pixelDeltaU = u/float(imageWidth);
-    this->pixelDeltaV = v/float(imageHeight);
+    this->u = u * this->width;
+    this->v = (v * -1) * this->height;
+
+    this->pixelDeltaU = this->u/float(imageWidth);
+    this->pixelDeltaV = this->v/float(imageHeight);
   }
 
 };

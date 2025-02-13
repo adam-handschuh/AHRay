@@ -9,10 +9,10 @@
 
 class Camera{
 private:
-  Vector3 eye, lookAt, up;
-  const int depth = 20;
-  const float focalLength = 1.0f;
-  const int numberOfSamples = 200;
+  Vector3 eye,lookAt,up;
+  const int depth = 6;
+  float focalLength = 1.0f;
+  const int numberOfSamples = 10;
   Viewport *viewport;
 public:
   explicit Camera(Viewport &viewport){
@@ -23,6 +23,9 @@ public:
     this->eye = eye;
     this->lookAt = lookAt;
     this->up = up;
+    this->viewport->calculate(eye,lookAt,up);
+
+    focalLength = (eye-lookAt).length();
   }
 
   Vector3 getColour(Ray& ray, Scene& scene, int currentDepth){
@@ -36,7 +39,7 @@ public:
         // 1. Calculate a new direction after hit
         Vector3 dir;
         // 2. Define refractive index
-        double refIndex = hitRec.front_face ? (1.0/1.5) : 1.5;
+        double refIndex = hitRec.front_face ? 1.0 : 0.8;
         // 3. Calculate new direction for ray
         if(hitRec.currentMat->getRoughness() >= 0.0f){
           // 3.1  Reflective
@@ -65,7 +68,7 @@ public:
 
   void render(std::vector<Fragment> &frags, Scene scene){
     //Location of the first pixel (top-left corner)
-    Vector3 startPixel = (eye - Vector3(0,0,focalLength) - (viewport->u/2) - (viewport->v/2))
+    Vector3 startPixel = (eye - (viewport->w * focalLength) - (viewport->u/2) - (viewport->v/2))
                          + ((viewport->pixelDeltaU + viewport->pixelDeltaV)/2);
 
     for(int h = 0; h < viewport->imageHeight; h ++){
