@@ -9,10 +9,21 @@
 
 class Camera{
 private:
-  Vector3 eye,lookAt,up;
+  Vector3 eye;
   const int depth = 6;
   float focalLength = 1.0f;
-  const int numberOfSamples = 10;
+  const int numberOfSamples = 30;
+
+  std::vector<float> tempDepthCols;
+  std::vector<Vector3> tempNormCols;
+  std::vector<Vector3> tempAlbedoCols;
+  std::vector<float> tempCannyCols;
+
+  std::vector<float> depthCols;
+  std::vector<Vector3> normCols;
+  std::vector<Vector3> albedoCols;
+  std::vector<float> cannyCols;
+
   Viewport *viewport;
 public:
   explicit Camera(Viewport &viewport){
@@ -21,21 +32,31 @@ public:
 
   void initialise(Vector3 eye, Vector3 lookAt, Vector3 up){
     this->eye = eye;
-    this->lookAt = lookAt;
-    this->up = up;
     this->viewport->calculate(eye,lookAt,up);
 
     focalLength = (eye-lookAt).length();
   }
 
-  Vector3 getColour(Ray& ray, Scene& scene, int currentDepth){
+  Vector3 getColour(Ray& ray, Scene& scene, int currentDepth, bool firstHit){
     if(currentDepth <= 0){
       return Vector3(0.0f,0.0f,0.0f);
     }
 
     //Create a record to track recursive hits
     HitRecord hitRec;
-    if (scene.hitSphere(ray, hitRec)) {
+    if (scene.hitSomething(ray, hitRec)) {
+        // 0. Set depth colour for depth map
+        if(firstHit) {
+          tempDepthCols.push_back(hitRec.t);
+          tempNormCols.push_back(hitRec.normal);
+          tempAlbedoCols.push_back(hitRec.currentMat->getColour());
+          if(scene.hitEdge){
+            tempCannyCols.push_back(255.0f);
+            //std::cout << "Hit Edge!" << std::endl;
+          }else{
+            tempCannyCols.push_back(0.0f);
+          }
+        }
         // 1. Calculate a new direction after hit
         Vector3 dir;
         // 2. Define refractive index
@@ -56,7 +77,14 @@ public:
         // 5. Calculate attenuation value to diminish intensity after each hit
         float attenuation = 0.8;
         // 6. Recursively trace the rays
-        return getColour(newRay, scene, currentDepth - 1) * hitRec.currentMat->getColour() * attenuation;
+        return getColour(newRay, scene, currentDepth - 1, false) * hitRec.currentMat->getColour() * attenuation;
+    }else{
+      if(firstHit){
+        tempDepthCols.push_back(10);
+        tempNormCols.push_back(Vector3(0,0,255));
+        tempAlbedoCols.push_back(Vector3(0,0,0));
+        tempCannyCols.push_back(0.0f);
+      }
     }
 
     // If the sphere is not hit (background)
@@ -82,13 +110,73 @@ public:
           Vector3 tempOffset = (viewport->pixelDeltaU + viewport->pixelDeltaV) * (float(rand()%100)/100.0f);
           tempOffset = tempOffset - tempOffset/2;
           Ray ray(eye, Vector3::unitVec(pixelCenter-eye + tempOffset));
-          colour = colour + getColour(ray, scene, depth)/float(numberOfSamples);
+          colour = colour + getColour(ray, scene, depth, true)/float(numberOfSamples);
         }
 
         frag.setFinalColour(colour.x, colour.y, colour.z);
         frags.push_back(frag);
       }
     }
+  }
+
+  std::vector<float> getDepthMap(){
+    int counter = 0;
+    float dSum = 0;
+    for (float tempDepthCol : tempDepthCols) {
+      counter ++;
+      dSum += tempDepthCol;
+      if(counter % numberOfSamples == 0){
+        dSum /= float(numberOfSamples);
+        depthCols.push_back(dSum);
+        dSum = 0;
+      }
+    }
+    return depthCols;
+  }
+
+  std::vector<Vector3> getNormalMap(){
+    int counter = 0;
+    Vector3 nSum(0,0,0);
+    for (Vector3 tempNormCol : tempNormCols) {
+      counter ++;
+      nSum = nSum + tempNormCol;
+      if(counter % numberOfSamples == 0){
+        nSum = nSum / float(numberOfSamples);
+        normCols.push_back(nSum);
+        nSum = Vector3(0,0,0);
+      }
+    }
+    return normCols;
+  }
+
+  std::vector<Vector3> getAlbedoMap(){
+    int counter = 0;
+    Vector3 aSum(0,0,0);
+    for (Vector3 tempAlbCol : tempAlbedoCols) {
+      counter ++;
+      aSum = aSum + tempAlbCol;
+      if(counter % numberOfSamples == 0){
+        aSum = aSum / float(numberOfSamples);
+        albedoCols.push_back(aSum);
+        aSum = Vector3(0,0,0);
+      }
+    }
+    return albedoCols;
+  }
+
+  std::vector<float> getCannyMap(){
+    int counter = 0;
+    float cSum = 0.0f;
+    for (float tempCanCol : tempCannyCols) {
+      counter ++;
+      cSum = cSum + tempCanCol;
+      if(counter % numberOfSamples == 0){
+        cSum = cSum / float(numberOfSamples);
+        cannyCols.push_back(cSum);
+        cSum = 0.0f;
+      }
+    }
+    return cannyCols;
   }
 
 };
