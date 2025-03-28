@@ -15,6 +15,7 @@ add_executable(AHRay
         include/sphere.h
         include/hitrecord.h
         include/material.h
+        include/cylinder.h
 )
 
 target_include_directories(AHRay

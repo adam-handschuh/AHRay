@@ -1,4 +1,3 @@
-
 #ifndef AHRAY_SPHERE_H
 #define AHRAY_SPHERE_H
 
@@ -53,7 +52,16 @@ public:
     hitRec.setFaceNormal(ray, outward_normal);
     hitRec.setMaterial(*material);
     return true;
+  }
 
+  bool isTangent(Ray &ray) {
+    Vector3 oc = pos - ray.origin;
+    auto a = ray.direction.lengthSqrd();
+    auto b = ray.direction.dot(oc);
+    auto c = oc.lengthSqrd() - radius * radius;
+    auto discriminant = b*b - a*c;
+
+    return std::abs(discriminant) < 0.0001; // small epsilon for floating point precision
   }
 
 };
