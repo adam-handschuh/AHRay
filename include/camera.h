@@ -50,12 +50,6 @@ public:
           tempDepthCols.push_back(hitRec.t);
           tempNormCols.push_back(hitRec.normal);
           tempAlbedoCols.push_back(hitRec.currentMat->getColour());
-          if(scene.hitEdge){
-            tempCannyCols.push_back(255.0f);
-            //std::cout << "Hit Edge!" << std::endl;
-          }else{
-            tempCannyCols.push_back(0.0f);
-          }
         }
         // 1. Calculate a new direction after hit
         Vector3 dir;

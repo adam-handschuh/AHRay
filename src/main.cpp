@@ -13,7 +13,7 @@ float x = 0;
 //Materials
 Material base(Vector3(1,1,1), -1.0);
 Material metal(Vector3(0.9,0.6,0.9), 0.25);
-Material diffuse(Vector3(0,0.9,0), 0.0);
+Material diffuse(Vector3(0,0.9,0), 1.0);
 Material mirror(Vector3(0.9,0.9,0.9), 0.0);
 Material glass(Vector3(0.8,0.8,0.9), -1.2);
 Material refr(Vector3(0.9,0.7,0.8), -1.5);
@@ -22,13 +22,14 @@ void createScene(){
   //Big Sphere (Base)
   scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f, base);
   //Medium Sphere (Mirror [Reflection])
-  scene.addToScene("cylinder", Vector3(-0.2,-0.495,-2.0), 0.3f, glass);
+//  scene.addToScene("cylinder", Vector3(-0.2,-0.495,-2.0), 0.3f, glass);
   //Small Sphere (Glass [Refraction])
-  scene.addToScene("sphere", Vector3(0.1f,-0.297,-1.3f), 0.2f, refr);
+//  scene.addToScene("sphere", Vector3(0.1f,-0.297,-1.3f), 0.2f, refr);
   //Small Sphere (Metal)
 //    scene.addToScene("sphere", Vector3(0.65f,-0.25,-1.55f), 0.25f, metal);
   //Smaller Sphere (Diffuse)
 //    scene.addToScene("sphere", Vector3(-0.4f,-0.35,-1.0f), 0.15f, diffuse);
+  scene.addModelToScene("C:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/monkey.obj", Vector3(0,0,-2), 0.2, diffuse);
 }
 void renderScene(int width, int height, Vector3 camPos){
     //Store resolution
@@ -130,7 +131,7 @@ int main() {
   std::cout << "Creating scene" << std::endl;
   createScene();
   std::cout << "Rendering scene" << std::endl;
-  renderScene(1000, 1000, Vector3(0,0.1,0));
+  renderScene(200, 200, Vector3(0,0.1,0));
   std::cout << "Exporting main render" << std::endl;
   saveAsPPM("Render.ppm");
   std::cout << "Exporting depth map" << std::endl;

@@ -16,6 +16,8 @@ add_executable(AHRay
         include/hitrecord.h
         include/material.h
         include/cylinder.h
+        include/ahray_objloader.h
+        include/triangle.h
 )
 
 target_include_directories(AHRay

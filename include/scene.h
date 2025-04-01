@@ -5,12 +5,18 @@
 #include <sphere.h>
 #include <iostream>
 #include <cylinder.h>
+#include <ahray_objloader.h>
+#include <triangle.h>
 
 class Scene {
 public:
   std::vector<Sphere> spheres;
   std::vector<Cylinder> cylinders;
-  bool hitEdge = false;
+  std::vector<Triangle> triangles;
+
+
+
+
 
   void addToScene(std::string objectName, Vector3 position, float scale, Material &material) {
     if (objectName == "sphere") {
@@ -20,6 +26,25 @@ public:
     if (objectName == "cylinder"){
       Cylinder newCylinder(position, scale, scale*3, material);
       cylinders.push_back(newCylinder);
+    }
+  }
+
+  void addModelToScene(const std::string &modelPath, Vector3 position, float scale, Material &material){
+    OBJMesh mesh;
+    if (!mesh.load(modelPath)) {
+      std::cerr << "Failed to load OBJ file." << std::endl;
+    }
+
+    // For each face, create a Triangle primitive and add it to your world.
+    for (const auto& face : mesh.faces) {
+      // Create a triangle from the mesh vertices.
+      Triangle tri(
+          (mesh.vertices[face.v[0]]*scale)+position,
+          (mesh.vertices[face.v[1]]*scale)+position,
+          (mesh.vertices[face.v[2]]*scale)+position,
+          material
+      );
+      triangles.push_back(tri);  // Add the triangle to your scene.
     }
   }
 
@@ -40,6 +65,14 @@ public:
 
     for(Cylinder cylinder:cylinders){
       if(cylinder.hit(r,min,max,temp_rec)){
+        hitDetected = true;
+        max = temp_rec.t;
+        rec = temp_rec;
+      }
+    }
+
+    for(Triangle triangle:triangles){
+      if(triangle.hit(r,min,max,temp_rec)){
         hitDetected = true;
         max = temp_rec.t;
         rec = temp_rec;
