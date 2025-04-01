@@ -27,11 +27,11 @@ public:
     Vector3 edge1 = v1 - v0;
     Vector3 edge2 = v2 - v0;
 
-    // Begin calculating determinant - also used to calculate u parameter.
+    // Begin calculating determinant - also used to calculate u parameter
     Vector3 h = r.direction.cross(edge2);
     float a = edge1.dot(h);
 
-    // If the determinant is near zero, ray lies in the plane of the triangle.
+    // If the determinant is near zero, ray lies in the plane of the triangle
     if (a > -EPSILON && a < EPSILON)
       return false;  // Parallel to triangle
 
@@ -46,12 +46,12 @@ public:
     if (v < 0.0f || u + v > 1.0f)
       return false;
 
-    // At this stage, we can compute t to find out where the intersection point is on the line.
+    // At this stage, we can compute t to find out where the intersection point is on the line
     float t = f * edge2.dot(q);
     if (t < t_min || t > t_max)
       return false;
 
-    // Record the intersection details.
+    // Record the intersection details
     rec.t = t;
     rec.position = r.at(t);
     // Compute the face normal (ensuring it is normalised)

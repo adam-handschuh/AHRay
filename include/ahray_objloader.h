@@ -20,7 +20,7 @@ public:
   std::vector<Vector3> vertices;
   std::vector<Face> faces;
 
-  // Load and parse an OBJ file.
+  // Load and parse an OBJ file
   bool load(const std::string& filename) {
     std::ifstream file(filename);
     if (!file) {
@@ -36,16 +36,16 @@ public:
       std::string prefix;
       iss >> prefix;
 
-      // Parse vertex positions.
+      // Parse vertex positions
       if (prefix == "v") {
         float x, y, z;
         iss >> x >> y >> z;
         vertices.push_back(Vector3(x, y, z));
       }
-      // Parse face definitions (assuming triangles).
+      // Parse face definitions (assuming triangles)
       else if (prefix == "f") {
         Face face;
-        // Here, we extract only the vertex index.
+        // Here, we extract only the vertex index
         for (int i = 0; i < 3; i++) {
           std::string token;
           iss >> token;
@@ -53,7 +53,7 @@ public:
           std::string indexStr;
           std::getline(tokenStream, indexStr, '/');
           face.v[i] =
-              std::atoi(indexStr.c_str()) - 1; // Convert to 0-based index.
+              std::atoi(indexStr.c_str()) - 1; // Convert to 0-based index
         }
         faces.push_back(face);
       }

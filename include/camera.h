@@ -10,19 +10,17 @@
 class Camera{
 private:
   Vector3 eye;
-  const int depth = 6;
+  const int depth = 10;
   float focalLength = 1.0f;
-  const int numberOfSamples = 30;
+  const int numberOfSamples = 20;
 
   std::vector<float> tempDepthCols;
   std::vector<Vector3> tempNormCols;
   std::vector<Vector3> tempAlbedoCols;
-  std::vector<float> tempCannyCols;
 
   std::vector<float> depthCols;
   std::vector<Vector3> normCols;
   std::vector<Vector3> albedoCols;
-  std::vector<float> cannyCols;
 
   Viewport *viewport;
 public:
@@ -77,7 +75,6 @@ public:
         tempDepthCols.push_back(10);
         tempNormCols.push_back(Vector3(0,0,255));
         tempAlbedoCols.push_back(Vector3(0,0,0));
-        tempCannyCols.push_back(0.0f);
       }
     }
 
@@ -156,21 +153,6 @@ public:
       }
     }
     return albedoCols;
-  }
-
-  std::vector<float> getCannyMap(){
-    int counter = 0;
-    float cSum = 0.0f;
-    for (float tempCanCol : tempCannyCols) {
-      counter ++;
-      cSum = cSum + tempCanCol;
-      if(counter % numberOfSamples == 0){
-        cSum = cSum / float(numberOfSamples);
-        cannyCols.push_back(cSum);
-        cSum = 0.0f;
-      }
-    }
-    return cannyCols;
   }
 
 };
