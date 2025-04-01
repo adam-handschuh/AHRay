@@ -12,11 +12,10 @@
 #include <cstdlib>
 #include <vector3.h>
 
-// A face represented by three vertex indices.
 class OBJMesh {
 public:
   struct Face {
-    int v[3];  // OBJ files index vertices starting at 1, so subtract 1 for 0-based indexing.
+    int v[3];
   };
   std::vector<Vector3> vertices;
   std::vector<Face> faces;
@@ -53,11 +52,11 @@ public:
           std::istringstream tokenStream(token);
           std::string indexStr;
           std::getline(tokenStream, indexStr, '/');
-          face.v[i] = std::atoi(indexStr.c_str()) - 1; // Convert to 0-based index.
+          face.v[i] =
+              std::atoi(indexStr.c_str()) - 1; // Convert to 0-based index.
         }
         faces.push_back(face);
       }
-      // Extend here for parsing normals ("vn") or texture coordinates ("vt") if needed.
     }
     return true;
   }
