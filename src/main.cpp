@@ -11,15 +11,17 @@ Scene scene;
 //Materials
 Material base(Vector3(1,1,1), -1.0);
 Material metal(Vector3(0.9,0.6,0.9), 0.25);
-Material diffuse(Vector3(1,1,1), 1.0);
+Material diffuse(Vector3(1,1,1), 0.1);
 Material mirror(Vector3(0.9,0.9,0.9), 0.0);
 Material glass(Vector3(0.8,0.8,0.9), -1.2);
 Material refr(Vector3(0.9,0.7,0.8), -1.5);
 
 void createScene(){
   //Big Sphere (Base)
-  scene.addToScene("sphere", Vector3(0,-100.5,-1), 100.0f, base);
-  scene.addModelToScene("C:\\Users\\Adam\\Desktop\\College\\Trinity\\Year_4\\Capstone\\AHRay\\monkey.obj", Vector3(0, 0, -2), 0.5f, mirror);
+  scene.addSphereToScene(Vector3(0,-100.5,-1), 100.0f, base);
+  scene.addModelToScene("C:\\Users\\Adam\\Desktop\\College\\Trinity\\Year_4\\Capstone\\AHRay\\cube.obj", Vector3(-0.2, -0.245, -2), 0.25f, base);
+  scene.addSphereToScene(Vector3(0.3,0,-3.5),0.5f,base);
+  scene.addLightToScene(Vector3(0.4,2.0,-4), Vector3(1.0f,1.0f,1.0f), Vector3(1.0f,1.0f,1.0f));
 }
 void renderScene(int width, int height, Vector3 camPos){
     //Store resolution

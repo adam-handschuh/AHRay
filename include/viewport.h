@@ -30,7 +30,6 @@ public:
     this->pixelDeltaU = this->u/float(imageWidth);
     this->pixelDeltaV = this->v/float(imageHeight);
   }
-
 };
 
 #endif

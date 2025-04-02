@@ -18,6 +18,7 @@ add_executable(AHRay
         include/cylinder.h
         include/ahray_objloader.h
         include/triangle.h
+        include/pointlight.h
 )
 
 target_include_directories(AHRay

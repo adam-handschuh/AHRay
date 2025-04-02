@@ -6,6 +6,7 @@
 #include <viewport.h>
 #include <vector>
 #include <scene.h>
+#include <pointlight.h>
 
 class Camera{
 private:
@@ -35,7 +36,7 @@ public:
     focalLength = (eye-lookAt).length();
   }
 
-  Vector3 getColour(Ray& ray, Scene& scene, int currentDepth, bool firstHit){
+  Vector3 getColour(Ray& ray, Scene& scene, int currentDepth){
     if(currentDepth <= 0){
       return Vector3(0.0f,0.0f,0.0f);
     }
@@ -44,11 +45,29 @@ public:
     HitRecord hitRec;
     if (scene.hitSomething(ray, hitRec)) {
         // 0. Set depth colour for depth map
-        if(firstHit) {
+        if(currentDepth == depth) {
           tempDepthCols.push_back(hitRec.t);
           tempNormCols.push_back(hitRec.normal);
           tempAlbedoCols.push_back(hitRec.currentMat->getColour());
         }
+        // 0.5 Compute direct illumination from all lights
+        Vector3 directLight(0.0f, 0.0f, 0.0f);
+        for (const PointLight &light : scene.lights) {
+          // Vector from hit point to light position
+          Vector3 toLight = light.position - hitRec.position;
+          float distanceToLight = toLight.length();
+          Vector3 lightDir = Vector3::unitVec(toLight);
+
+          // Create a shadow ray from the hit point, offset slightly along the normal to avoid self-intersection
+          Ray shadowRay(hitRec.position + hitRec.normal * 0.001, lightDir);
+
+          if (!scene.hitSomething(shadowRay, hitRec)) {
+            // Lambertian diffuse shading: dot product of the normal and light direction
+            float NdotL = std::max(float(hitRec.normal.dot(lightDir)), 0.0f);
+            directLight = directLight + (light.intensity * light.colour * NdotL);
+          }
+        }
+
         // 1. Calculate a new direction after hit
         Vector3 dir;
         // 2. Define refractive index
@@ -68,10 +87,14 @@ public:
         Ray newRay(hitRec.position, dir);
         // 5. Calculate attenuation value to diminish intensity after each hit
         float attenuation = 0.8;
-        // 6. Recursively trace the rays
-        return getColour(newRay, scene, currentDepth - 1, false) * hitRec.currentMat->getColour() * attenuation;
+        // 6. Recursively trace the rays (to obtain indirectColour)
+        Vector3 indirectColour = getColour(newRay, scene, currentDepth - 1) * hitRec.currentMat->getColour() * attenuation;
+
+        // 7. Return the final colour of for the pixel (combo of the other stuff)
+        Vector3 finalColour = (directLight * hitRec.currentMat->getColour()) + indirectColour;
+        return finalColour;
     }else{
-      if(firstHit){
+      if(currentDepth == depth){
         tempDepthCols.push_back(10);
         tempNormCols.push_back(Vector3(0,0,255));
         tempAlbedoCols.push_back(Vector3(0,0,0));
@@ -84,6 +107,7 @@ public:
     auto b = Vector3(1.0, 1.0, 1.0)*(1.0-a) + Vector3(0.5, 0.7, 1.0)*a;
     return b; // Returns a gradient of blue based on the y direction of the ray
   }
+
 
   void render(std::vector<Fragment> &frags, Scene scene){
     //Location of the first pixel (top-left corner)
@@ -101,7 +125,7 @@ public:
           Vector3 tempOffset = (viewport->pixelDeltaU + viewport->pixelDeltaV) * (float(rand()%100)/100.0f);
           tempOffset = tempOffset - tempOffset/2;
           Ray ray(eye, Vector3::unitVec(pixelCenter-eye + tempOffset));
-          colour = colour + getColour(ray, scene, depth, true)/float(numberOfSamples);
+          colour = colour + getColour(ray, scene, depth)/float(numberOfSamples);
         }
 
         frag.setFinalColour(colour.x, colour.y, colour.z);

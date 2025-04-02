@@ -1,32 +1,31 @@
 #ifndef AHRAY_SCENE_H
 #define AHRAY_SCENE_H
-#include <vector>
-#include <vector3.h>
-#include <sphere.h>
-#include <iostream>
-#include <cylinder.h>
+#include <pointlight.h>
 #include <ahray_objloader.h>
+#include <cylinder.h>
+#include <iostream>
+#include <sphere.h>
 #include <triangle.h>
+#include <vector3.h>
+#include <vector>
 
 class Scene {
 public:
   std::vector<Sphere> spheres;
   std::vector<Cylinder> cylinders;
   std::vector<Triangle> triangles;
+  std::vector<PointLight> lights;
 
 
+  void addLightToScene(Vector3 position, Vector3 colour, Vector3 intensity){
+    PointLight newLight = PointLight(position,colour,intensity);
+    lights.push_back(newLight);
+  }
 
 
-
-  void addToScene(std::string objectName, Vector3 position, float scale, Material &material) {
-    if (objectName == "sphere") {
+  void addSphereToScene(Vector3 position, float scale, Material &material) {
       Sphere newSphere(position, scale, material);
       spheres.push_back(newSphere);
-    }
-    if (objectName == "cylinder"){
-      Cylinder newCylinder(position, scale, scale*3, material);
-      cylinders.push_back(newCylinder);
-    }
   }
 
   void addModelToScene(const std::string &modelPath, Vector3 position, float scale, Material &material){
