@@ -45,8 +45,84 @@ void renderScene(int width, int height, Vector3 camPos){
     nFrags = camera.getNormalMap();
     aFrags = camera.getAlbedoMap();
 }
-void saveAsPPM(const std::string& filename){
-    std::ofstream file(filename);
+
+void convertPPMToPNG(const std::string& ppmFilename, const std::string& pngFilename) {
+  std::ifstream infile(ppmFilename);
+  if (!infile) {
+    std::cerr << "Error opening PPM file: " << ppmFilename << std::endl;
+    return;
+  }
+
+  std::string line;
+
+  // Read the magic number (should be "P3")
+  std::getline(infile, line);
+  if (line != "P3") {
+    std::cerr << "Invalid PPM format. Expected 'P3' but got '" << line << "'" << std::endl;
+    return;
+  }
+
+  // Skip any comment lines and read width and height
+  int width = 0, height = 0;
+  while (std::getline(infile, line)) {
+    if (line.empty() || line[0] == '#') continue;
+    std::istringstream dims(line);
+    if (dims >> width >> height)
+      break;
+  }
+  if (width <= 0 || height <= 0) {
+    std::cerr << "Invalid image dimensions." << std::endl;
+    return;
+  }
+
+  // Skip comments and read the max color value
+  int maxVal = 0;
+  while (std::getline(infile, line)) {
+    if (line.empty() || line[0] == '#') continue;
+    std::istringstream maxLine(line);
+    if (maxLine >> maxVal)
+      break;
+  }
+  if (maxVal <= 0) {
+    std::cerr << "Invalid maximum color value." << std::endl;
+    return;
+  }
+
+  // Prepare a container for pixel data in RGBA format.
+  // lodepng expects a vector of unsigned char with each pixel as R, G, B, A.
+  std::vector<unsigned char> image;
+  image.reserve(width * height * 4);
+
+  // Read pixel data (r, g, b values) from the file
+  int r, g, b;
+  int pixelCount = 0;
+  while (infile >> r >> g >> b) {
+    // Normalize each color channel to the 0-255 range.
+    unsigned char red   = static_cast<unsigned char>(r * 255 / maxVal);
+    unsigned char green = static_cast<unsigned char>(g * 255 / maxVal);
+    unsigned char blue  = static_cast<unsigned char>(b * 255 / maxVal);
+
+    image.push_back(red);
+    image.push_back(green);
+    image.push_back(blue);
+    image.push_back(255);  // Fully opaque alpha channel
+
+    ++pixelCount;
+  }
+
+  if (pixelCount != width * height) {
+    std::cerr << "Warning: Pixel count (" << pixelCount
+              << ") does not match image dimensions (" << width * height << ")." << std::endl;
+    // Depending on your application you might want to exit or handle the discrepancy.
+  }
+
+  // Encode the image into a PNG file using lodepng.
+  lodepng::encode("output/" + pngFilename, image, width, height);
+
+  std::cout << "Successfully created PNG file: " << pngFilename << std::endl;
+}
+void saveAsPNG(const std::string& filename){
+    std::ofstream file(filename + ".ppm");
     if(!file.is_open()){
         std::cerr << "Unable to open file";
     }
@@ -62,10 +138,13 @@ void saveAsPPM(const std::string& filename){
         file << red << " " << green << " " << blue << std::endl;
     }
     file.close();
+
+    // Convert PPM to PNG
+    convertPPMToPNG(filename+".ppm", filename+".png");
 }
 
 void saveDepthMap(const std::string& filename){
-  std::ofstream file(filename);
+  std::ofstream file(filename + ".ppm");
   if(!file.is_open()){
     std::cerr << "Unable to open file";
   }
@@ -79,9 +158,11 @@ void saveDepthMap(const std::string& filename){
     file << d << " " << d << " " << d << std::endl;
   }
   file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
 }
 void saveNormalMap(const std::string& filename){
-  std::ofstream file(filename);
+  std::ofstream file(filename + ".ppm");
   if(!file.is_open()){
     std::cerr << "Unable to open file";
   }
@@ -98,9 +179,11 @@ void saveNormalMap(const std::string& filename){
     file << r << " " << g << " " << b << std::endl;
   }
   file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
 }
 void saveAlbedoMap(const std::string& filename){
-  std::ofstream file(filename);
+  std::ofstream file(filename + ".ppm");
   if(!file.is_open()){
     std::cerr << "Unable to open file";
   }
@@ -116,8 +199,9 @@ void saveAlbedoMap(const std::string& filename){
     file << r << " " << g << " " << b << std::endl;
   }
   file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
 }
-
 
 int main() {
   std::cout << "Creating scene" << std::endl;
@@ -125,13 +209,13 @@ int main() {
   std::cout << "Rendering scene" << std::endl;
   renderScene(700, 700, Vector3(0,0.1,0));
   std::cout << "Exporting main render" << std::endl;
-  saveAsPPM("Render.ppm");
+  saveAsPNG("Render");
   std::cout << "Exporting depth map" << std::endl;
-  saveDepthMap("DepthMap.ppm");
+  saveDepthMap("DepthMap");
   std::cout << "Exporting normal map" << std::endl;
-  saveNormalMap("NormalMap.ppm");
+  saveNormalMap("NormalMap");
   std::cout << "Exporting albedo map" << std::endl;
-  saveAlbedoMap("AlbedoMap.ppm");
+  saveAlbedoMap("AlbedoMap");
   std::cout << std::endl << "Process finished!";
   return 0;
 }

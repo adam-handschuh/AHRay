@@ -52,7 +52,14 @@ build cmake_object_order_depends_target_AHRay: phony || .
 build CMakeFiles/AHRay.dir/src/main.cpp.obj: CXX_COMPILER__AHRay_unscanned_Debug C$:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/src/main.cpp || cmake_object_order_depends_target_AHRay
   DEP_FILE = CMakeFiles\AHRay.dir\src\main.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
-  INCLUDES = -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/src
+  INCLUDES = -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include/external -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/src
+  OBJECT_DIR = CMakeFiles\AHRay.dir
+  OBJECT_FILE_DIR = CMakeFiles\AHRay.dir\src
+
+build CMakeFiles/AHRay.dir/src/lodepng.cpp.obj: CXX_COMPILER__AHRay_unscanned_Debug C$:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/src/lodepng.cpp || cmake_object_order_depends_target_AHRay
+  DEP_FILE = CMakeFiles\AHRay.dir\src\lodepng.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include/external -IC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/src
   OBJECT_DIR = CMakeFiles\AHRay.dir
   OBJECT_FILE_DIR = CMakeFiles\AHRay.dir\src
 
@@ -64,7 +71,7 @@ build CMakeFiles/AHRay.dir/src/main.cpp.obj: CXX_COMPILER__AHRay_unscanned_Debug
 #############################################
 # Link the executable AHRay.exe
 
-build AHRay.exe: CXX_EXECUTABLE_LINKER__AHRay_Debug CMakeFiles/AHRay.dir/src/main.cpp.obj
+build AHRay.exe: CXX_EXECUTABLE_LINKER__AHRay_Debug CMakeFiles/AHRay.dir/src/main.cpp.obj CMakeFiles/AHRay.dir/src/lodepng.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LC:/Users/Adam/Desktop/College/Trinity/Year_4/Capstone/AHRay/include/fragment.h

@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(AHRay
         src/main.cpp
+        src/lodepng.cpp
         include/fragment.h
         include/vector3.h
         src/config.h
@@ -19,10 +20,12 @@ add_executable(AHRay
         include/ahray_objloader.h
         include/triangle.h
         include/pointlight.h
+        include/external/lodepng.h
 )
 
 target_include_directories(AHRay
         PRIVATE include
+        PRIVATE include/external
         PRIVATE src)
 
 target_link_directories(AHRay

@@ -11,3 +11,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+
+//External libraries
+#include <external/lodepng.h>
