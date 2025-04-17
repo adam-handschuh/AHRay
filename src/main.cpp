@@ -1,27 +1,47 @@
 #include <config.h>
 
 int renderWidth, renderHeight;
+
+//Time Setup
+time_t now;
+
+//Main Render
 std::vector<Fragment> frags;
+//Standard Maps
 std::vector<float> dFrags;
 std::vector<Vector3> nFrags;
+//Experimental Maps
 std::vector<Vector3> aFrags;
+std::vector<float> sFrags;
+//Light Maps
+std::vector<Vector3> rfrFrags;
+std::vector<Vector3> rflFrags;
 
 Scene scene;
 
 //Materials
 Material base(Vector3(1,1,1), -1.0);
-Material metal(Vector3(0.9,0.6,0.9), 0.25);
-Material diffuse(Vector3(1,1,1), 0.1);
+Material diffuse(Vector3(1,0,0), -0.1);
+Material diffuse2(Vector3(0.35,0.35,0), -0.1);
 Material mirror(Vector3(0.9,0.9,0.9), 0.0);
-Material glass(Vector3(0.8,0.8,0.9), -1.2);
-Material refr(Vector3(0.9,0.7,0.8), -1.5);
+Material glass(Vector3(0.95,1.0,0.95), -1.5);
 
 void createScene(){
-  //Big Sphere (Base)
   scene.addSphereToScene(Vector3(0,-100.5,-1), 100.0f, base);
-  scene.addModelToScene("C:\\Users\\Adam\\Desktop\\College\\Trinity\\Year_4\\Capstone\\AHRay\\cube.obj", Vector3(-0.2, -0.245, -2), 0.25f, base);
-  scene.addSphereToScene(Vector3(0.3,0,-3.5),0.5f,base);
-  scene.addLightToScene(Vector3(0.4,2.0,-4), Vector3(1.0f,1.0f,1.0f), Vector3(1.0f,1.0f,1.0f));
+
+  // Diffuse
+//  scene.addSphereToScene(Vector3(0,-0.15,-2.0f), 0.35f, diffuse);
+
+  // Refraction
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\cup.obj)", Vector3(0.0, -0.25, -2), 0.25f, glass);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\straw.obj)", Vector3(0.0, -0.25, -2), 0.25f, diffuse);
+
+  // Reflection
+//  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\mirror_base.obj)", Vector3(-0.53,0, -2.5), 0.25f, diffuse2);
+//  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\mirror_surface.obj)", Vector3(-0.53,0, -2.5), 0.25f, mirror);
+
+  //scene.addSphereToScene(Vector3(0.3,0,-3.5),0.5f,mirror);
+  scene.addLightToScene(Vector3(0.8,3.0,-4), Vector3(1.0f,1.0f,1.0f), Vector3(0.25,0.25,0.25));
 }
 void renderScene(int width, int height, Vector3 camPos){
     //Store resolution
@@ -44,6 +64,9 @@ void renderScene(int width, int height, Vector3 camPos){
     dFrags = camera.getDepthMap();
     nFrags = camera.getNormalMap();
     aFrags = camera.getAlbedoMap();
+    sFrags = camera.getShadowMap();
+    rfrFrags = camera.getRefractMap();
+    rflFrags = camera.getReflectMap();
 }
 
 void convertPPMToPNG(const std::string& ppmFilename, const std::string& pngFilename) {
@@ -119,7 +142,10 @@ void convertPPMToPNG(const std::string& ppmFilename, const std::string& pngFilen
   // Encode the image into a PNG file using lodepng.
   lodepng::encode("output/" + pngFilename, image, width, height);
 
-  std::cout << "Successfully created PNG file: " << pngFilename << std::endl;
+  time(&now);
+  std::string dt = ctime(&now);
+
+  std::cout << "Successfully created PNG file: " << pngFilename << " ---------> [" << dt.substr(11,8) << "]" << std::endl;
 }
 void saveAsPNG(const std::string& filename){
     std::ofstream file(filename + ".ppm");
@@ -153,7 +179,7 @@ void saveDepthMap(const std::string& filename){
   file << "P3\n" << renderWidth << " " << renderHeight << "\n255\n";
 
   for(int i = 0; i < renderWidth*renderHeight; i ++){
-    int d = static_cast<int>(255 - std::clamp(dFrags.at(i),0.0f,5.0f) * 51);
+    int d = static_cast<int>(255 - std::clamp(dFrags.at(i),0.0f,20.0f) * 12.75);
 
     file << d << " " << d << " " << d << std::endl;
   }
@@ -203,19 +229,111 @@ void saveAlbedoMap(const std::string& filename){
   convertPPMToPNG(filename+".ppm", filename+".png");
 }
 
+void saveShadowMap(const std::string& filename){
+  std::ofstream file(filename + ".ppm");
+  if(!file.is_open()){
+    std::cerr << "Unable to open file";
+  }
+
+  //PPM file header
+  file << "P3\n" << renderWidth << " " << renderHeight << "\n255\n";
+
+  for(int i = 0; i < renderWidth*renderHeight; i ++){
+    int s = static_cast<int>(sFrags.at(i));
+
+    file << s << " " << s << " " << s << std::endl;
+  }
+  file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
+}
+void saveReflectionMap(const std::string& filename){
+  std::ofstream file(filename + ".ppm");
+  if(!file.is_open()){
+    std::cerr << "Unable to open file";
+  }
+
+  //PPM file header
+  file << "P3\n" << renderWidth << " " << renderHeight << "\n255\n";
+
+  for(int i = 0; i < renderWidth*renderHeight; i ++){
+    int r = static_cast<int>(rflFrags.at(i).x*255);
+    int g = static_cast<int>(rflFrags.at(i).y*255);
+    int b = static_cast<int>(rflFrags.at(i).z*255);
+
+    if(!(r == g && g == b)) {
+      if (std::max(r, std::max(g, b)) == r) {
+        g /= 2;
+        b /= 2;
+      } else if (std::max(r, std::max(g, b)) == g) {
+        r /= 2;
+        b /= 2;
+      } else {
+        r /= 2;
+        g /= 2;
+      }
+    }
+
+    file << r << " " << g << " " << b << std::endl;
+  }
+  file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
+}
+void saveRefractionMap(const std::string& filename){
+  std::ofstream file(filename + ".ppm");
+  if(!file.is_open()){
+    std::cerr << "Unable to open file";
+  }
+
+  //PPM file header
+  file << "P3\n" << renderWidth << " " << renderHeight << "\n255\n";
+
+  for(int i = 0; i < renderWidth*renderHeight; i ++){
+    int r = static_cast<int>(rfrFrags.at(i).x*255);
+    int g = static_cast<int>(rfrFrags.at(i).y*255);
+    int b = static_cast<int>(rfrFrags.at(i).z*255);
+
+    if(!(r == g && g == b)) {
+      if (std::max(r, std::max(g, b)) == r) {
+        g /= 2;
+        b /= 2;
+      } else if (std::max(r, std::max(g, b)) == g) {
+        r /= 2;
+        b /= 2;
+      } else {
+        r /= 2;
+        g /= 2;
+      }
+    }
+
+
+    file << r << " " << g << " " << b << std::endl;
+  }
+  file.close();
+  // Convert PPM to PNG
+  convertPPMToPNG(filename+".ppm", filename+".png");
+}
+
 int main() {
-  std::cout << "Creating scene" << std::endl;
   createScene();
-  std::cout << "Rendering scene" << std::endl;
-  renderScene(700, 700, Vector3(0,0.1,0));
-  std::cout << "Exporting main render" << std::endl;
+  int resX, resY;
+  std::cout << "Enter width:";
+  std::cin >> resX;
+  std::cout << "Enter height:";
+  std::cin >> resY;
+  time(&now);
+  std::string dt = ctime(&now);
+
+  std::cout << std::endl << "Processing..." << " ----------> [" << dt.substr(11,8) << "]" << std::endl;
+  renderScene(resX, resY, Vector3(-0.2,0.3,0));
   saveAsPNG("Render");
-  std::cout << "Exporting depth map" << std::endl;
   saveDepthMap("DepthMap");
-  std::cout << "Exporting normal map" << std::endl;
   saveNormalMap("NormalMap");
-  std::cout << "Exporting albedo map" << std::endl;
-  saveAlbedoMap("AlbedoMap");
+  //saveAlbedoMap("AlbedoMap");
+  saveShadowMap("ShadowMap");
+  saveRefractionMap("RefractionMap");
+  saveReflectionMap("ReflectionMap");
   std::cout << std::endl << "Process finished!";
   return 0;
 }

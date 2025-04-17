@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <ctime>
+#include <iomanip>
 
 //External libraries
 #include <external/lodepng.h>
