@@ -21,27 +21,40 @@ Scene scene;
 
 //Materials
 Material base(Vector3(1,1,1), -1.0);
-Material diffuse(Vector3(1,0,0), -0.1);
-Material diffuse2(Vector3(0.35,0.35,0), -0.1);
+Material diffuse1(Vector3(0,0.9,0), -0.1);
+Material diffuse2(Vector3(0.4,0.4,0), -0.1);
+Material diffuse3(Vector3(0,0,1), -0.1);
+Material diffuse4(Vector3(0.85,0.85,0), -0.1);
+
 Material mirror(Vector3(0.9,0.9,0.9), 0.0);
 Material glass(Vector3(0.95,1.0,0.95), -1.5);
 
 void createScene(){
-  scene.addSphereToScene(Vector3(0,-100.5,-1), 100.0f, base);
+//  scene.addSphereToScene(Vector3(0,-100.5,-1), 100.0f, base);
 
   // Diffuse
 //  scene.addSphereToScene(Vector3(0,-0.15,-2.0f), 0.35f, diffuse);
 
   // Refraction
-  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\cup.obj)", Vector3(0.0, -0.25, -2), 0.25f, glass);
-  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\straw.obj)", Vector3(0.0, -0.25, -2), 0.25f, diffuse);
+//  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\cup.obj)", Vector3(0.0, -0.25, -2), 0.25f, glass);
+//  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\straw.obj)", Vector3(0.0, -0.25, -2), 0.25f, diffuse);
 
   // Reflection
 //  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\mirror_base.obj)", Vector3(-0.53,0, -2.5), 0.25f, diffuse2);
 //  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\mirror_surface.obj)", Vector3(-0.53,0, -2.5), 0.25f, mirror);
 
+  // Complex
+  Vector3 scenePosition(-0.95,-0.82,0.96);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\floor.obj)", scenePosition, 0.25f, diffuse1);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\cup.obj)", scenePosition, 0.25f,   glass);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\chair.obj)", scenePosition+Vector3(0.3,0,-0.3), 0.25f, diffuse2);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\table.obj)", scenePosition, 0.25f, diffuse3);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\mirror_frame.obj)", scenePosition, 0.25f, diffuse4);
+  scene.addModelToScene(R"(C:\Users\Adam\Desktop\College\Trinity\Year_4\Capstone\AHRay\complex_scene\mirror_plane.obj)", scenePosition, 0.25f, mirror);
+
+
   //scene.addSphereToScene(Vector3(0.3,0,-3.5),0.5f,mirror);
-  scene.addLightToScene(Vector3(0.8,3.0,-4), Vector3(1.0f,1.0f,1.0f), Vector3(0.25,0.25,0.25));
+  scene.addLightToScene(Vector3(-1,3.0,0), Vector3(1.0f,1.0f,1.0f), Vector3(0.25,0.25,0.25));
 }
 void renderScene(int width, int height, Vector3 camPos){
     //Store resolution
@@ -55,7 +68,7 @@ void renderScene(int width, int height, Vector3 camPos){
 
     Camera camera(viewport);
     camera.initialise(camPos,
-                      Vector3(0,0,-1.5),
+                      Vector3(-1.5,-0.2,1.5),
                       Vector3(0,1,0));
 
     //Render the scene using the camera
@@ -179,7 +192,7 @@ void saveDepthMap(const std::string& filename){
   file << "P3\n" << renderWidth << " " << renderHeight << "\n255\n";
 
   for(int i = 0; i < renderWidth*renderHeight; i ++){
-    int d = static_cast<int>(255 - std::clamp(dFrags.at(i),0.0f,20.0f) * 12.75);
+    int d = static_cast<int>(255 - std::clamp(dFrags.at(i),0.0f,12.75f) * 20);
 
     file << d << " " << d << " " << d << std::endl;
   }
@@ -326,7 +339,7 @@ int main() {
   std::string dt = ctime(&now);
 
   std::cout << std::endl << "Processing..." << " ----------> [" << dt.substr(11,8) << "]" << std::endl;
-  renderScene(resX, resY, Vector3(-0.2,0.3,0));
+  renderScene(resX, resY, Vector3(0,0,0));
   saveAsPNG("Render");
   saveDepthMap("DepthMap");
   saveNormalMap("NormalMap");

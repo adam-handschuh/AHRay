@@ -90,8 +90,8 @@ public:
         Vector3 dir;
         // 2. Define refractive index
         double etai_over_etat = hitRec.front_face
-                                    ? (1.0 / 1.09)
-                                    : 1.09;
+                                    ? (1.0 / 1.03)
+                                    : 1.03;
         // 3. Calculate new direction for ray
         if(hitRec.currentMat->getRoughness() >= 0.0f){
           // 3.1  Reflective
@@ -139,7 +139,7 @@ public:
         return finalColour;
     }else{
       if(currentDepth == depth){
-        tempDepthCols.push_back(20.0);
+        tempDepthCols.push_back(12.75);
         tempNormCols.push_back(Vector3(0,0,1));
         tempAlbedoCols.push_back(Vector3(0,0,0));
         tempShadCols.push_back(255.0f);
